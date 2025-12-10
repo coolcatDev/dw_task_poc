@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.lifespan import main_lifespan
+from app.routes import tasks
 import logging
 
 # --- Logging Setup ---
@@ -13,6 +14,10 @@ app = FastAPI(
     description="A concise FastAPI service with SQLite and an LLM summarization feature.",
     lifespan=main_lifespan
 )
+
+# Include API routers
+app.include_router(tasks.router, prefix="/api/v1")
+logger.info("API routers added successfully.")
 
 @app.get("/", tags=["Healthcheck"])
 async def read_root():
