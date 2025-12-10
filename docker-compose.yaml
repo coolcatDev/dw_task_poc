@@ -24,3 +24,35 @@ services:
     # Run Uvicorn with the --reload flag to watch the mounted files
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     restart: always
+
+
+  client:
+
+    # Service context directory
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    
+    # Expose the client to the host
+    ports:
+      - "3000:3000"
+    
+
+    volumes:
+      # Mount the local client code for hot-reloading
+      - ./client:/app
+      # Create an anonymous volume to explicitly mask the node_modules path.
+      # This ensures the dependencies installed during the build
+      # remain visible and aren't overwritten/masked by the host's previous volume mount.
+      - /app/node_modules
+
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
+    # Wait for the server to be ready before starting the client dev server
+    depends_on:
+      - server
+    
+    # Start the development server
+    command: npm run dev
+    restart: always
