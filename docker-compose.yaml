@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  server:
+    
+    # Service context directory
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    
+    # Expose the server to the host
+    ports:
+      - "8000:8000"
+    
+    # Mount the server code as external volume for hot-reloading
+    volumes:
+      # Crrect volume mapping from host to container
+      - ./server:/app 
+    
+    # Pass environment variables
+    env_file:
+      - .env
+    
+    # Run Uvicorn with the --reload flag to watch the mounted files
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    restart: always
