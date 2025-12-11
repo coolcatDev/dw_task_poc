@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.config import settings
 from app.lifespan import main_lifespan
 from app.routes import tasks
 import logging
@@ -14,6 +16,21 @@ app = FastAPI(
     description="A concise FastAPI service with SQLite and an LLM summarization feature.",
     lifespan=main_lifespan
 )
+
+# --- CORS Middleware ---
+
+# Split the string into a list of origins
+origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(",")]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+logger.info(f"CORS middleware configured for origins: {origins}")
+
 
 # Include API routers
 app.include_router(tasks.router, prefix="/api/v1")
