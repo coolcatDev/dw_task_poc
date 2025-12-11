@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.lifespan import main_lifespan
-from app.routes import tasks
+from app.routes import tasks, summary
 import logging
 
 # --- Logging Setup ---
@@ -34,6 +34,7 @@ logger.info(f"CORS middleware configured for origins: {origins}")
 
 # Include API routers
 app.include_router(tasks.router, prefix="/api/v1")
+app.include_router(summary.router, prefix="/api/v1")
 logger.info("API routers added successfully.")
 
 @app.get("/", tags=["Healthcheck"])
