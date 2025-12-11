@@ -14,7 +14,7 @@ services:
     
     # Mount the server code as external volume for hot-reloading
     volumes:
-      # Crrect volume mapping from host to container
+      # Correct volume mapping from host to container
       - ./server:/app 
     
     # Pass environment variables
@@ -36,14 +36,14 @@ services:
     # Expose the client to the host
     ports:
       - "3000:3000"
-    
 
     volumes:
-      # Mount the local client code for hot-reloading
+      # Mount the local client code for hot-reloading(bind volume)
       - ./client:/app
       # Create an anonymous volume to explicitly mask the node_modules path.
       # This ensures the dependencies installed during the build
       # remain visible and aren't overwritten/masked by the host's previous volume mount.
+      # Anonymous Volume -> mask the overwrites of standard volumes.
       - /app/node_modules
 
     environment:
