@@ -79,13 +79,35 @@ class LLMSummaryEngine:
             await asyncio.sleep(0.5 * (attempt + 1))
 
         # --- Fallback if all retries fail ---
-        done_count = sum(1 for t in tasks if t.is_done)
-        pending_count = len(tasks) - done_count
+        
+        # Separate Tasks
+        done_tasks = [t for t in tasks if t.is_done]
+        pending_tasks = [t for t in tasks if not t.is_done]
+
+        # Calculate Counts
+        done_count = len(done_tasks)
+        pending_count = len(pending_tasks)
+        
+        # Create Descriptive Fallback Text
+        if pending_count > 0:
+            pending_titles = [t.title for t in pending_tasks]
+            pending_desc = f"[AI Summary Unavailable]: You have {pending_count} pending tasks: {', '.join(pending_titles)}."
+        else:
+            pending_desc = "[AI Summary Unavailable]: All tasks are complete!"
+
+        if done_count > 0:
+            done_titles = [t.title for t in done_tasks]
+            done_desc = f"[AI Summary Unavailable]: You have completed {done_count} tasks: {', '.join(done_titles)}."
+        else:
+            done_desc = "[AI Summary Unavailable]: No tasks have been completed yet."
+
+        # 4. Return the enhanced, data-driven fallback
         return LLMSummaryResponse(
             count=len(tasks),
             done_count=done_count,
             pending_count=pending_count,
-            description_done="Fallback: summary unavailable",
-            description_pending="Fallback: summary unavailable",
-            suggested_order_of_priority=[t.title for t in tasks],
+            description_done=done_desc,
+            description_pending=pending_desc,
+            # Priority should only list pending tasks, ordered by their current DB ID/order
+            suggested_order_of_priority=[t.title for t in pending_tasks],
         )
