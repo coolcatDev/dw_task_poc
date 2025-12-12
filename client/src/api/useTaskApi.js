@@ -84,6 +84,10 @@ export const useTaskApi = () => {
         method: 'DELETE',
     }), [apiCall]);
 
+    const getSummary = useCallback(() => apiCall('/llm/summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    }), [apiCall]);
 
     return {
         tasks,
@@ -93,6 +97,7 @@ export const useTaskApi = () => {
         addTask,
         updateTask,
         deleteTask,
-        setTasks
+        setTasks,
+        getSummary
     };
 };

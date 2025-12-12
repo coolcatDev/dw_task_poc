@@ -1,36 +1,79 @@
-/* Basic Reset and Global Styles */
+/* --- 1. Basic Reset and Global Styles (Minimalist Focus) --- */
+:root {
+    --color-primary: #1e88e5; /* Soft Blue */
+    --color-primary-dark: #1565c0;
+    --color-background: #f8f9fa; /* Light Gray/White */
+    --color-surface: #ffffff; /* Pure White for cards/containers */
+    --color-text: #212529; /* Dark Gray for readability */
+    --color-text-secondary: #6c757d; /* Muted gray for descriptions */
+    --color-success: #28a745;
+    --color-error: #dc3545;
+    --color-warning: #ffc107;
+    --border-radius: 8px;
+    --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
+    --shadow-raised: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f7f9;
-    color: #333;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; /* Modern, clean font */
+    background-color: var(--color-background);
+    color: var(--color-text);
     margin: 0;
     padding: 0;
+    line-height: 1.6;
 }
 
 .App {
-    max-width: 800px;
-    margin: 50px auto;
+    max-width: 900px; /* Increased max-width for better use of space */
+    margin: 30px auto; /* Slightly smaller margin */
     padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: var(--color-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-raised); /* Softened shadow */
+    transition: all 0.3s ease-in-out;
 }
 
 h1 {
     text-align: center;
-    color: #007bff;
-    margin-bottom: 30px;
+    color: var(--color-primary-dark);
+    margin-bottom: 35px;
+    font-weight: 600; /* Slightly bolder */
 }
 
-/* --- Input and Form Styles --- */
+/* --- 2. Responsive Design (Media Queries) --- */
+@media (max-width: 960px) {
+    .App {
+        margin: 20px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 600px) {
+    .App {
+        margin: 10px;
+        padding: 10px;
+    }
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+    .task-input form {
+        grid-template-columns: 1fr; /* Stack inputs on mobile */
+    }
+}
+
+
+/* --- 3. Input and Form Styles (Clean & Minimal) --- */
 .task-input form, .edit-form {
     display: grid;
-    gap: 10px;
+    grid-template-columns: 1fr 1fr 150px; /* Title, Description, Button */
+    gap: 15px;
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    background-color: #f9f9f9;
+    border: none; /* Removed border */
+    border-radius: var(--border-radius);
+    margin-bottom: 25px;
+    background-color: var(--color-background); /* Lighter background */
+    box-shadow: var(--shadow-subtle); /* Subtle shadow lift */
 }
 
 .input-group {
@@ -39,56 +82,69 @@ h1 {
 }
 
 input[type="text"], textarea {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    transition: border-color 0.3s;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px; /* Softer radius */
+    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
     width: 100%;
     box-sizing: border-box;
+    background: var(--color-surface);
 }
 
-textarea {
-    resize: vertical;
+input[type="text"]:focus, textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+    outline: none;
 }
 
-/* --- Validation Styles (Strokes and Labels) --- */
+/* --- Validation Styles --- */
 .input-error-stroke {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 0 0.1rem rgba(220, 53, 69, 0.25);
+    border-color: var(--color-error) !important;
+    box-shadow: 0 0 0 1px var(--color-error) !important;
 }
 
 .error-label {
-    color: #dc3545;
-    font-weight: bold;
+    color: var(--color-error);
+    font-size: 0.9em;
+    margin-top: 5px;
 }
 
-/* --- Button Styles --- */
+/* --- 4. Button Styles (Flat & Primary) --- */
 button {
-    padding: 10px 15px;
+    padding: 12px 15px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
+    font-weight: 600;
+    font-size: 1em;
+    transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 button:hover:not(:disabled) {
-    opacity: 0.9;
+    box-shadow: var(--shadow-subtle);
 }
 
 button:disabled {
     cursor: not-allowed;
-    background-color: #cccccc;
-    color: #666;
+    background-color: #e0e0e0;
+    color: #a0a0a0;
 }
 
 .task-input button[type="submit"] {
-    background-color: #007bff;
+    background-color: var(--color-primary);
     color: white;
+    align-self: flex-start; /* Aligns button to top in the grid */
+    margin-top: 19px; /* Compensate for label/input height */
+}
+@media (max-width: 600px) {
+    .task-input button[type="submit"] {
+        margin-top: 0;
+        align-self: stretch;
+    }
 }
 
-/* --- Task List and Item Styles --- */
+/* --- 5. Task List and Item Styles (Card-like) --- */
 .task-list ul {
     list-style: none;
     padding: 0;
@@ -98,13 +154,18 @@ button:disabled {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    margin-bottom: 8px;
-    background: #fff;
-    border: 1px solid #eee;
-    border-left: 5px solid #007bff;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    background: var(--color-surface);
+    border: 1px solid #f0f0f0; /* Very light border */
+    border-left: 5px solid var(--color-primary); /* Accent line */
+    border-radius: 6px;
+    box-shadow: var(--shadow-subtle);
+    transition: all 0.2s;
+}
+.task-list li:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .task-content {
@@ -115,49 +176,59 @@ button:disabled {
 }
 
 .task-title {
-    font-weight: bold;
-    font-size: 1.1em;
+    font-weight: 500;
+    font-size: 1.05em;
+    color: var(--color-text);
 }
 
 .task-description {
-    font-size: 0.9em;
-    color: #666;
-    margin-top: 5px;
+    font-size: 0.85em;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px; /* Use gap for spacing */
+    margin-left: 15px;
 }
 
 .task-actions button {
-    margin-left: 10px;
-    padding: 6px 10px;
-    font-size: 0.9em;
+    padding: 8px 12px;
+    font-size: 0.85em;
+    min-width: 70px; /* consistent button width */
 }
 
 .edit-btn {
-    background: #ffc107;
+    background: #495057; /* Darker gray/secondary color */
     color: white;
 }
 
 .delete-btn {
-    background: #dc3545;
+    background: var(--color-error);
     color: white;
 }
 
 .task-list h2{
-    color: #757575;
+    color: var(--color-text-secondary);
     text-align: right;
-    font-size: large;
+    font-size: 1em;
+    font-weight: 400;
+    margin-bottom: 15px;
 }
 
 .task-list li.done {
-    background: #e9ecef;
-    border-left: 5px solid #28a745;
-    opacity: 0.7;
+    background: #f0f8ff; /* Very light blue tint */
+    border-left: 5px solid var(--color-success);
+    opacity: 0.85; /* Reduced opacity change */
 }
 
 .task-list li.done .task-title {
     text-decoration: line-through;
+    color: var(--color-text-secondary);
 }
 
-/* --- Edit Form in List --- */
+/* --- Edit Form in List (Cleaned up) --- */
 .edit-form {
     display: flex;
     flex-direction: column;
@@ -173,40 +244,148 @@ button:disabled {
     display: flex;
     gap: 10px;
     margin-top: 10px;
+    justify-content: flex-end; /* Align actions to the right */
 }
 
-
-/* --- API Status Indicators (Global Style) --- */
+/* --- 6. API Status Indicators --- */
 .status {
     position: fixed;
-    padding: 10px;
-    top: 10px;
-    right: 10px;
-    border-radius: 4px;
-    font-weight: bold;
+    padding: 10px 15px;
+    top: 20px; /* Moved down */
+    right: 20px; /* Moved in */
+    border-radius: 6px;
+    font-weight: 500;
     text-align: center;
-    transition: opacity 0.3s ease-out; 
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out; 
+    box-shadow: var(--shadow-raised);
+    z-index: 1000;
 }
 
 .status.processing {
-    background-color: #ffc107; /* Yellow/Processing */
-    color: #333;
+    background-color: var(--color-warning);
+    color: var(--color-text);
 }
 
 .status.success {
-    background-color: #d4edda; /* Light Green */
-    color: #155724;
+    background-color: #e6ffed; /* Toned down success color */
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
 }
 
 .status.error {
-    background-color: #f8d7da; /* Light Red */
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background-color: #fff0f0;
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
 }
 
 .task-item-error {
-    margin-top: 5px;
-    margin-bottom: -3px;
+    /* Style consistency */
+    background: #fef0f0;
+    color: var(--color-error);
+    border-left: 3px solid var(--color-error);
     padding: 5px 10px;
+    margin-top: 5px;
     font-size: 0.85em;
+}
+
+/* --- 7. Summary Box Styles (Minimalist & Accent) --- */
+.summary-box {
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 25px;
+    margin-bottom: 30px;
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-raised); /* Make it stand out slightly */
+}
+
+.summary-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    font-size: 1.3em;
+}
+
+.summary-button {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 0.95em;
+}
+
+.summary-stats {
+    display: flex;
+    justify-content: space-between; /* Changed to space-between for cleaner look */
+    padding: 10px 0;
+    font-size: 1em;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.stat-item {
+    padding: 0 10px;
+    flex: 1;
+    text-align: center;
+}
+.stat-item:not(:last-child) {
+    border-right: 1px solid #eee;
+}
+
+.stat-item strong {
+    margin-left: 5px;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.stat-item.done strong {
+    color: var(--color-success);
+}
+
+.stat-item.pending strong {
+    color: var(--color-error); /* Use error color for pending items to highlight action needed */
+}
+
+.summary-description h3, .priority-list h3 {
+    margin-top: 25px;
+    margin-bottom: 10px;
+    color: var(--color-primary-dark);
+    font-size: 1.1em;
+    font-weight: 500;
+    border-left: 3px solid var(--color-primary);
+    padding-left: 12px;
+}
+
+.priority-list {
+    list-style-type: none; /* Remove default dots/numbers */
+    counter-reset: priority-counter;
+    padding-left: 0;
+    margin-top: 10px;
+}
+.priority-list li {
+    counter-increment: priority-counter;
+    margin-bottom: 8px;
+    padding-left: 25px;
+    position: relative;
+    color: var(--color-text);
+    font-size: 0.95em;
+}
+.priority-list li::before {
+    content: counter(priority-counter) ".";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
+.initial-message {
+    color: var(--color-text-secondary);
+    text-align: center;
+    font-style: italic;
+    padding: 20px;
 }

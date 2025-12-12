@@ -3,6 +3,7 @@ import './App.css';
 import { useTaskApi } from './api/useTaskApi';
 import TaskList from './components/TaskList';
 import TaskForm from './components/TaskForm';
+import SummaryReport from './components/SummaryReport';
 
 function App() {
     // API Data Service
@@ -14,7 +15,12 @@ function App() {
         addTask, 
         updateTask, 
         deleteTask, 
+        getSummary,
     } = useTaskApi();
+
+    const [summaryReport, setSummaryReport] = useState(null);
+    const [summaryStatus, setSummaryStatus] = useState('ready');
+    const [summaryError, setSummaryError] = useState(null);
 
     // Fetch Data on Mount
     useEffect(() => {
@@ -42,11 +48,26 @@ function App() {
         fetchTasks();
     }, [updateTask, fetchTasks]);
 
+    const handleGetSummary = useCallback(async () => {
+        setSummaryStatus('processing');
+        setSummaryError(null);
+        setSummaryReport(null); // Clear previous report
+                
+        try {
+            const data = await getSummary(); 
+            setSummaryReport(data); // Store the structured object
+            setSummaryStatus('ready');        
+        } catch (e) {
+            setSummaryError("Could not retrieve AI summary.");
+            setSummaryStatus('error');        
+        }
+    }, [getSummary]);
+
     // Render App Components
     return (
         <div className="App">
             <h1>Task Manager</h1>
-            
+
             <TaskForm onAddTask={handleAddTask} />
 
             <TaskList 
@@ -57,6 +78,14 @@ function App() {
                 toggleTask={toggleTask}
                 handleDeleteTask={handleDeleteTask}
                 handleUpdateTask={handleUpdateTask}
+            />
+
+            <SummaryReport
+                summaryReport={summaryReport}
+                onGetSummary={handleGetSummary}
+                isProcessing={summaryStatus === 'processing'}
+                status={summaryStatus}
+                error={summaryError}
             />
         </div>
     );

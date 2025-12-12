@@ -11,7 +11,7 @@ router = APIRouter(
     tags=["LLM Feature"]
 )
 
-@router.get("/summary", response_model=LLMSummaryResponse)
+@router.post("/summary", response_model=LLMSummaryResponse)
 async def get_task_summary_endpoint(
     db: Session = Depends(get_session),
     llm_client = Depends(get_llm_client)
