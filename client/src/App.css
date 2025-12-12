@@ -15,7 +15,7 @@
 }
 
 body {
-    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; /* Modern, clean font */
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; 
     background-color: var(--color-background);
     color: var(--color-text);
     margin: 0;
@@ -24,12 +24,12 @@ body {
 }
 
 .App {
-    max-width: 900px; /* Increased max-width for better use of space */
-    margin: 30px auto; /* Slightly smaller margin */
+    max-width: 900px;
+    margin: 30px auto;
     padding: 20px;
     background: var(--color-surface);
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow-raised); /* Softened shadow */
+    box-shadow: var(--shadow-raised);
     transition: all 0.3s ease-in-out;
 }
 
@@ -37,7 +37,7 @@ h1 {
     text-align: center;
     color: var(--color-primary-dark);
     margin-bottom: 35px;
-    font-weight: 600; /* Slightly bolder */
+    font-weight: 600;
 }
 
 /* --- 2. Responsive Design (Media Queries) --- */
@@ -57,23 +57,27 @@ h1 {
         font-size: 1.8em;
         margin-bottom: 20px;
     }
-    .task-input form {
-        grid-template-columns: 1fr; /* Stack inputs on mobile */
-    }
 }
 
 
 /* --- 3. Input and Form Styles (Clean & Minimal) --- */
-.task-input form, .edit-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr 150px; /* Title, Description, Button */
-    gap: 15px;
+.task-input form {
     padding: 20px;
-    border: none; /* Removed border */
+    border: none;
     border-radius: var(--border-radius);
     margin-bottom: 25px;
-    background-color: var(--color-background); /* Lighter background */
-    box-shadow: var(--shadow-subtle); /* Subtle shadow lift */
+    background-color: var(--color-background);
+    box-shadow: var(--shadow-subtle);
+}
+
+.edit-form {
+    padding: 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    margin-bottom: 25px;
+    background-color: var(--color-background);
+    box-shadow: var(--shadow-subtle);
+    margin-bottom: 10px;
 }
 
 .input-group {
@@ -83,11 +87,13 @@ h1 {
 
 input[type="text"], textarea {
     padding: 12px 15px;
+    margin-bottom: 10px;
     border: 1px solid #e0e0e0;
-    border-radius: 6px; /* Softer radius */
+    border-radius: 6px;
     font-size: 15px;
     transition: border-color 0.2s, box-shadow 0.2s;
     width: 100%;
+    height: -webkit-fill-available;
     box-sizing: border-box;
     background: var(--color-surface);
 }
@@ -131,16 +137,22 @@ button:disabled {
     color: #a0a0a0;
 }
 
+/* Adjusted task-input button for grid layout to stretch over inputs */
 .task-input button[type="submit"] {
     background-color: var(--color-primary);
     color: white;
-    align-self: flex-start; /* Aligns button to top in the grid */
-    margin-top: 19px; /* Compensate for label/input height */
+    grid-row: 1 / span 2;
+    align-self: stretch;
+    margin-top: 0;
+    font-size: medium;
+    width: 100%;
 }
+
 @media (max-width: 600px) {
     .task-input button[type="submit"] {
         margin-top: 0;
         align-self: stretch;
+        grid-row: auto;
     }
 }
 
@@ -157,8 +169,8 @@ button:disabled {
     padding: 15px 20px;
     margin-bottom: 12px;
     background: var(--color-surface);
-    border: 1px solid #f0f0f0; /* Very light border */
-    border-left: 5px solid var(--color-primary); /* Accent line */
+    border: 1px solid #f0f0f0;
+    border-left: 5px solid var(--color-primary);
     border-radius: 6px;
     box-shadow: var(--shadow-subtle);
     transition: all 0.2s;
@@ -189,18 +201,18 @@ button:disabled {
 
 .task-actions {
     display: flex;
-    gap: 8px; /* Use gap for spacing */
+    gap: 8px;
     margin-left: 15px;
 }
 
 .task-actions button {
     padding: 8px 12px;
     font-size: 0.85em;
-    min-width: 70px; /* consistent button width */
+    min-width: 70px;
 }
 
 .edit-btn {
-    background: #495057; /* Darker gray/secondary color */
+    background: #ea9c23;
     color: white;
 }
 
@@ -218,9 +230,9 @@ button:disabled {
 }
 
 .task-list li.done {
-    background: #f0f8ff; /* Very light blue tint */
+    background: #f0f8ff;
     border-left: 5px solid var(--color-success);
-    opacity: 0.85; /* Reduced opacity change */
+    opacity: 0.85;
 }
 
 .task-list li.done .task-title {
@@ -230,13 +242,11 @@ button:disabled {
 
 /* --- Edit Form in List (Cleaned up) --- */
 .edit-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 0;
+    padding: 20px;
     border: none;
-    background: none;
+    background: #ffffff;
     margin: 0;
+    box-shadow: none;
     width: 100%;
 }
 
@@ -244,58 +254,22 @@ button:disabled {
     display: flex;
     gap: 10px;
     margin-top: 10px;
-    justify-content: flex-end; /* Align actions to the right */
+    justify-content: flex-end;
 }
 
-/* --- 6. API Status Indicators --- */
-.status {
-    position: fixed;
-    padding: 10px 15px;
-    top: 20px; /* Moved down */
-    right: 20px; /* Moved in */
-    border-radius: 6px;
-    font-weight: 500;
-    text-align: center;
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out; 
-    box-shadow: var(--shadow-raised);
-    z-index: 1000;
-}
-
-.status.processing {
-    background-color: var(--color-warning);
-    color: var(--color-text);
-}
-
-.status.success {
-    background-color: #e6ffed; /* Toned down success color */
-    color: var(--color-success);
-    border: 1px solid var(--color-success);
-}
-
-.status.error {
-    background-color: #fff0f0;
-    color: var(--color-error);
-    border: 1px solid var(--color-error);
-}
-
-.task-item-error {
-    /* Style consistency */
-    background: #fef0f0;
-    color: var(--color-error);
-    border-left: 3px solid var(--color-error);
-    padding: 5px 10px;
-    margin-top: 5px;
-    font-size: 0.85em;
+.edit-actions [type="submit"]{
+    background-color: var(--color-primary);
+    color: white;
 }
 
 /* --- 7. Summary Box Styles (Minimalist & Accent) --- */
 .summary-box {
     border: none;
     border-radius: var(--border-radius);
-    padding: 25px;
+    padding: 20px;
     margin-bottom: 30px;
     background-color: var(--color-surface);
-    box-shadow: var(--shadow-raised); /* Make it stand out slightly */
+    box-shadow: var(--shadow-raised);
 }
 
 .summary-title {
@@ -308,6 +282,7 @@ button:disabled {
     margin-bottom: 20px;
     font-weight: 500;
     font-size: 1.3em;
+    color: var(--color-primary-dark);;
 }
 
 .summary-button {
@@ -316,12 +291,13 @@ button:disabled {
     border: none;
     padding: 10px 18px;
     border-radius: 6px;
-    font-size: 0.95em;
+    width: 150px;
+    font-size: medium;
 }
 
 .summary-stats {
     display: flex;
-    justify-content: space-between; /* Changed to space-between for cleaner look */
+    justify-content: space-between;
     padding: 10px 0;
     font-size: 1em;
     font-weight: 500;
@@ -348,7 +324,7 @@ button:disabled {
 }
 
 .stat-item.pending strong {
-    color: var(--color-error); /* Use error color for pending items to highlight action needed */
+    color: var(--color-error);
 }
 
 .summary-description h3, .priority-list h3 {
@@ -362,7 +338,7 @@ button:disabled {
 }
 
 .priority-list {
-    list-style-type: none; /* Remove default dots/numbers */
+    list-style-type: none;
     counter-reset: priority-counter;
     padding-left: 0;
     margin-top: 10px;

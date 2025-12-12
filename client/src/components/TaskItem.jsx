@@ -1,33 +1,25 @@
 import React, { useState } from 'react';
 
-const TaskItem = ({ task, onToggle, onDelete, onUpdate, fetchTasks }) => { 
+const TaskItem = ({ task, onToggle, onDelete, onUpdate, fetchTasks }) => {  
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(task.title);
     const [editDescription, setEditDescription] = useState(task.description);
     const [editTitleError, setEditTitleError] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const [deleteError, setDeleteError] = useState(null);
-    const [saveError, setSaveError] = useState(null);
-    const [isToggling, setIsToggling] = useState(false); 
-
+    
     const startEdit = (e) => {
         e.stopPropagation();
         setIsEditing(true);
-        setSaveError(null); 
     };
 
     const handleDelete = async (e) => {
         e.stopPropagation();
-        setDeleteError(null); 
-        setIsDeleting(true);
         try {
             await onDelete(task.id);
             fetchTasks();
         } catch (e) {
-            setDeleteError(`Deletion failed: ${e.message}`);
-        }
-        setIsDeleting(false);
+            throw e;
+        } 
     };
 
     const handleEditSubmit = async (e) => {
@@ -37,7 +29,7 @@ const TaskItem = ({ task, onToggle, onDelete, onUpdate, fetchTasks }) => {
             setEditTitleError(true);
             return;
         }
-        setSaveError(null); 
+        setEditTitleError(false);
         
         if (editTitle === task.title && editDescription === task.description) {
             setIsEditing(false);
@@ -52,25 +44,24 @@ const TaskItem = ({ task, onToggle, onDelete, onUpdate, fetchTasks }) => {
                 description: editDescription.trim()
             });
             fetchTasks();
-            setIsEditing(false); 
+            setIsEditing(false);    
         } catch (e) {
-            setSaveError(`Save failed: ${e.message}`);
+            throw e;
+        } finally {
+            setIsSaving(false);
         }
-        setIsSaving(false);
     };
 
     const handleToggle = async () => {
-        setDeleteError(null);
-        setSaveError(null);
-        setIsToggling(true);
         try {
-            await onToggle(task); // Calls App.jsx, which calls updateTask()
+            await onToggle(task);
             fetchTasks();
         } catch (e) {
-            setDeleteError(`Status change failed: ${e.message}`);
-        }
-        setIsToggling(false);
+            throw e;
+        } 
     };
+
+    const isActionDisabled = isSaving;
 
     if (isEditing) {
         return (
@@ -90,7 +81,6 @@ const TaskItem = ({ task, onToggle, onDelete, onUpdate, fetchTasks }) => {
                             }}
                             className={editTitleError ? 'input-error-stroke' : ''}
                             disabled={isSaving}
-                            required
                         />
                     </div>
                     
@@ -105,7 +95,6 @@ const TaskItem = ({ task, onToggle, onDelete, onUpdate, fetchTasks }) => {
                         />
                     </div>
                     
-                    {saveError && <p className="error">{saveError}</p>}
                     <div className="edit-actions">
                         <button type="submit" disabled={isSaving || editTitleError}>
                             {isSaving ? 'Saving...' : 'Save'}
@@ -119,23 +108,20 @@ const TaskItem = ({ task, onToggle, onDelete, onUpdate, fetchTasks }) => {
         );
     }
 
-    const isActionDisabled = isDeleting || isSaving || isToggling; 
-
     return (
-        <li key={task.id} className={task.is_done ? 'done' : '' || (isToggling ? 'toggling' : '')}>
+        <li key={task.id} className={task.is_done ? 'done' : ''}>
             <div className="task-content" onClick={isActionDisabled ? undefined : handleToggle}>
                 <span className="task-title">{task.title}</span>
                 {task.description && <span className="task-description">{task.description}</span>}
             </div>
-            {deleteError && <p className="error task-item-error">{deleteError}</p>}
             <div className="task-actions">
                 <button onClick={startEdit} className="edit-btn" disabled={isActionDisabled}>Edit</button>
                 <button 
-                    onClick={handleDelete} 
-                    className="delete-btn" 
+                    onClick={handleDelete}  
+                    className="delete-btn"  
                     disabled={isActionDisabled}
                 >
-                    {isDeleting ? 'Deleting...' : 'Delete'}
+                    Delete
                 </button>
             </div>
         </li>

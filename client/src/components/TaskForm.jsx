@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 
-const TaskForm = ({ onAddTask }) => { 
+const TaskForm = ({ onAddTask }) => {   
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [titleError, setTitleError] = useState(false);
-    const [isProcessing, setIsProcessing] = useState(false); 
-    const [addError, setAddError] = useState(null); 
+    const [isProcessing, setIsProcessing] = useState(false);    
 
     const handleSubmit = async (e) => { 
         e.preventDefault();
@@ -15,9 +14,8 @@ const TaskForm = ({ onAddTask }) => {
             return;
         }
         setTitleError(false);
-        setAddError(null); 
 
-        setIsProcessing(true); 
+        setIsProcessing(true);  
         try {
             await onAddTask({
                 title: title.trim(),
@@ -28,9 +26,10 @@ const TaskForm = ({ onAddTask }) => {
             setTitle('');
             setDescription('');
         } catch (e) {
-            setAddError(`Failed to add task: ${e.message}`);
+            throw e; 
+        } finally {
+            setIsProcessing(false); 
         }
-        setIsProcessing(false); 
     };
 
     return (
@@ -65,9 +64,7 @@ const TaskForm = ({ onAddTask }) => {
                         disabled={isProcessing}
                     />
                 </div>
-                
-                {addError && <p className="error">{addError}</p>}
-                
+                                
                 <button type="submit" disabled={isProcessing || titleError}>
                     {isProcessing ? 'Adding Task...' : 'Add Task'}
                 </button>

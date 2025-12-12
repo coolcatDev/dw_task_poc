@@ -1,7 +1,7 @@
-// client/src/components/SummaryReport.jsx
 import React from 'react';
 
-const SummaryReport = ({ summaryReport, onGetSummary, isProcessing, status, error }) => {
+// Removed: status, error props
+const SummaryReport = ({ summaryReport, onGetSummary, isProcessing }) => {
     
     // Check if we have valid, structured report data
     const hasReport = summaryReport && summaryReport.count !== undefined;
@@ -21,7 +21,7 @@ const SummaryReport = ({ summaryReport, onGetSummary, isProcessing, status, erro
             <h2 className="summary-title">
                 AI Task Analysis
                 <button 
-                    onClick={onGetSummary} 
+                    onClick={onGetSummary}  
                     disabled={isProcessing}
                     className="summary-button"
                 >
@@ -29,13 +29,6 @@ const SummaryReport = ({ summaryReport, onGetSummary, isProcessing, status, erro
                 </button>
             </h2>
 
-            {/* --- Status/Error Feedback --- */}
-            {isProcessing && (
-                <p className="summary-status processing">Generating report...</p>
-            )}
-            {status === 'error' && error && (
-                <p className="summary-status error">Error: {error}</p>
-            )}
 
             {/* --- Report Content --- */}
             {hasReport ? (

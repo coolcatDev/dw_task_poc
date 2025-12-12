@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import './App.css';
+import { Toaster } from 'react-hot-toast';
 import { useTaskApi } from './api/useTaskApi';
 import TaskList from './components/TaskList';
 import TaskForm from './components/TaskForm';
@@ -9,8 +10,6 @@ function App() {
     // API Data Service
     const { 
         tasks, 
-        listStatus, 
-        listError, 
         fetchTasks, 
         addTask, 
         updateTask, 
@@ -19,19 +18,18 @@ function App() {
     } = useTaskApi();
 
     const [summaryReport, setSummaryReport] = useState(null);
-    const [summaryStatus, setSummaryStatus] = useState('ready');
-    const [summaryError, setSummaryError] = useState(null);
+    const [isSummaryProcessing, setIsSummaryProcessing] = useState(false);
 
     // Fetch Data on Mount
     useEffect(() => {
         fetchTasks();
     }, [fetchTasks]); 
 
-
     // Task Handlers
     const toggleTask = useCallback(async (task) => {
         await updateTask(task.id, { ...task, is_done: !task.is_done });
-    }, [updateTask]);
+        fetchTasks();
+    }, [updateTask, fetchTasks]);
 
     const handleAddTask = useCallback(async (taskData) => {
         await addTask(taskData);
@@ -49,31 +47,29 @@ function App() {
     }, [updateTask, fetchTasks]);
 
     const handleGetSummary = useCallback(async () => {
-        setSummaryStatus('processing');
-        setSummaryError(null);
-        setSummaryReport(null); // Clear previous report
-                
+        setIsSummaryProcessing(true);
+        setSummaryReport(null);
+
         try {
             const data = await getSummary(); 
-            setSummaryReport(data); // Store the structured object
-            setSummaryStatus('ready');        
+            setSummaryReport(data);
         } catch (e) {
-            setSummaryError("Could not retrieve AI summary.");
-            setSummaryStatus('error');        
+            // Error is handled by the toast in useTaskApi.js
+        } finally {
+            setIsSummaryProcessing(false);       
         }
     }, [getSummary]);
 
     // Render App Components
     return (
         <div className="App">
+            <Toaster position="top-right" /> {/* Global Toast Container */}
             <h1>Task Manager</h1>
 
             <TaskForm onAddTask={handleAddTask} />
 
             <TaskList 
                 tasks={tasks.slice().sort((a, b) => b.id - a.id)} 
-                listStatus={listStatus} 
-                listError={listError}
                 fetchTasks={fetchTasks}
                 toggleTask={toggleTask}
                 handleDeleteTask={handleDeleteTask}
@@ -83,9 +79,7 @@ function App() {
             <SummaryReport
                 summaryReport={summaryReport}
                 onGetSummary={handleGetSummary}
-                isProcessing={summaryStatus === 'processing'}
-                status={summaryStatus}
-                error={summaryError}
+                isProcessing={isSummaryProcessing} // Now uses the simplified boolean state
             />
         </div>
     );

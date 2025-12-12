@@ -1,28 +1,25 @@
 import { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
-const STATUS_DISPLAY_DURATION = 2000; // 2 seconds
 
 export const useTaskApi = () => {
 
-    // Task List State
     const [tasks, setTasks] = useState([]);
-    const [listStatus, setListStatus] = useState('ready'); // processing, success, error, ready
-    const [listError, setListError] = useState(null);
 
-    // API Call Wrapper
     const apiCall = useCallback(async (endpoint, options = {}) => {
         try {
             const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-            
+
             if (!response.ok) {
-                let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+                let errorMessage = 'An unexpected error occurred!';
                 try {
                     const errorBody = await response.json();
-                    if (errorBody.detail) {
-                        errorMessage = errorBody.detail;
-                    }
-                } catch (e) {}
+                    errorMessage = errorBody.detail || errorMessage;
+                } catch (e) {
+                    errorMessage = `API Error: ${response.status} ${response.statusText}`;
+                }
+                toast.error(errorMessage);
                 throw new Error(errorMessage);
             }
 
@@ -35,64 +32,81 @@ export const useTaskApi = () => {
 
         } catch (err) {
             console.error('API Call Failed:', err.message);
+            if (err.message.includes('fetch')) {
+                toast.error('Check network connection!');
+            }
             throw err;
         }
     }, []);
 
-    // API Calls
     const fetchTasks = useCallback(async () => {
-        setListStatus('processing');
-        setListError(null);
-        let statusToSet = 'ready'; // Default status
-
         try {
             const data = await apiCall('/tasks/');
             if (data) setTasks(data);
-            statusToSet = 'success';
         } catch (e) {
-            setListError(e.message);
-            statusToSet = 'error';
+            setTasks([]);
         }
-
-        // Set the final transient status (success or error)
-        setListStatus(statusToSet); 
-
-        // CRITICAL: Set a timer to clear the status back to 'ready' after 3s
-        // This makes the 'success' or 'error' message auto-hide.
-        const timer = setTimeout(() => {
-            setListStatus('ready');
-        }, STATUS_DISPLAY_DURATION);
-        
-        // Return cleanup function to clear timer if component unmounts quickly
-        return () => clearTimeout(timer); 
-
     }, [apiCall]);
 
-    const addTask = useCallback((taskData) => apiCall('/tasks/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(taskData),
-    }), [apiCall]);
+    const addTask = useCallback(async (taskData) => {
+        try {
+            const data = await apiCall('/tasks/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(taskData),
+            });
+            toast.success('Task added successfully!');
+            return data;
+        } catch (e) {
+            throw e;
+        }
+    }, [apiCall]);
 
-    const updateTask = useCallback((taskId, taskData) => apiCall(`/tasks/${taskId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(taskData),
-    }), [apiCall]);
+    const updateTask = useCallback(async (taskId, taskData) => {
+        try {
+            const data = await apiCall(`/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(taskData),
+            });
 
-    const deleteTask = useCallback((taskId) => apiCall(`/tasks/${taskId}`, {
-        method: 'DELETE',
-    }), [apiCall]);
+            toast.success('Task updated successfully!');
+            
+            return data;
+        } catch (e) {
+            throw e;
+        }
+    }, [apiCall]);
 
-    const getSummary = useCallback(() => apiCall('/llm/summary', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-    }), [apiCall]);
+    const deleteTask = useCallback(async (taskId) => {
+        try {
+            const data = await apiCall(`/tasks/${taskId}`, {
+                method: 'DELETE',
+            });
+            toast.success('Task deleted successfully!');
+            return data;
+        } catch (e) {
+            throw e;
+        }
+    }, [apiCall]);
+
+    const getSummary = useCallback(async () => {
+        const loadingToastId = toast.loading('Generating AI summary!');
+        try {
+            const data = await apiCall('/llm/summary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            toast.success('AI summary generated!', { id: loadingToastId });
+            return data;
+        } catch (e) {
+            toast.error('Failed to get AI summary!', { id: loadingToastId });
+            throw e;
+        }
+    }, [apiCall]);
 
     return {
         tasks,
-        listStatus,
-        listError,
         fetchTasks,
         addTask,
         updateTask,
