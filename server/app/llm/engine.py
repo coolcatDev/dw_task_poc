@@ -19,17 +19,26 @@ class LLMSummaryEngine:
         self.client = client
 
     async def summarize(self, tasks: List[Task]) -> LLMSummaryResponse:
+
         # --- Prepare task prompt ---
         task_lines = [
             f"- [{'x' if t.is_done else ' '}] {t.title}: {t.description or 'No description'}"
             for t in tasks
         ]
-        prompt = (
-            "You are an AI assistant summarizing a user's to-do list.\n"
-            "Respond ONLY in valid JSON matching the schema below:\n"
-            "Fields: count, done_count, pending_count, description_done, description_pending, suggested_order_of_priority.\n\n"
-            "TASK LIST:\n" + "\n".join(task_lines)
-        )
+        
+        # FIX: Injecting the CRITICAL RULE into the prompt body.
+        task_list_content = "\n".join(task_lines)
+        
+        prompt = f"""
+        You are an AI assistant summarizing a user's to-do list.
+        Respond ONLY in valid JSON matching the schema below:
+        Fields: count, done_count, pending_count, description_done, description_pending, suggested_order_of_priority.
+
+        CRITICAL RULE: The 'suggested_order_of_priority' list MUST contain ONLY the exact, unmodified task titles (e.g., "Stretch", not "Stretch: description"). Do not include any descriptions, numbers, or bullet points in that list.
+
+        TASK LIST:
+        {task_list_content}
+        """
 
         # --- JSON Schema for structured output (include required 'name') ---
         json_schema = {
@@ -66,6 +75,7 @@ class LLMSummaryEngine:
                 validator = LLMSummaryValidator(tasks)
                 if validator.validate(summary):
                     return summary
+                
 
                 print(f"[LLM] Business validation failed on attempt {attempt+1}, retrying...")
 
